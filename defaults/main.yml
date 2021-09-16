@@ -1,0 +1,11 @@
+---
+
+awscli_users:
+  backup:  # user
+    default:  # profile
+      aws_access_key_id: changeme  # key definition
+      aws_secret_access_key: changeme
+
+awscli_defaultconfig:
+  region: us-east-1
+  output: json

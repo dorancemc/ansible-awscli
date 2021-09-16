@@ -1,0 +1,18 @@
+---
+
+- include: awscli_facts.yml
+
+- name: deleting awscli python package version prior 2
+  pip:
+    name: awscli
+    state: absent
+  become: yes
+  when: awscli_facts.rc==0 and awscli_version is defined and awscli_version.split('.')[0]|int<2
+
+- include: awscli_v2.yml
+  when: aws_installtype=="install" or aws_installtype=="update"
+
+- include: awscli_configure.yml
+  with_items: "{{ awscli_users }}"
+  loop_control:
+    loop_var: _user

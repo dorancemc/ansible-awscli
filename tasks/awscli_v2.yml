@@ -1,0 +1,36 @@
+---
+
+- name: create temporary directory
+  tempfile:
+    state: directory
+    suffix: awscli
+  register: tempfolder
+  changed_when: false
+
+- name: download awscli
+  unarchive:
+    src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: "{{ tempfolder.path }}"
+    remote_src: yes
+
+- name: installing awscli
+  command: 
+    cmd: "./install"
+    chdir: "{{ tempfolder.path }}/aws/"
+  become: yes
+  when: aws_installtype=="install"
+
+- name: updating awscli
+  command: 
+    argv: 
+      - "./install"
+      - "--update"
+    chdir: "{{ tempfolder.path }}/aws/"
+  become: yes
+  when: aws_installtype=="update"
+
+- name: delete temporary directory
+  file:
+    path: "{{ tempfolder.path }}"
+    state: absent
+  no_log: yes

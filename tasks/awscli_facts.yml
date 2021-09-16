@@ -1,0 +1,47 @@
+---
+
+- name: check aws path
+  command: /usr/bin/which aws
+  register: awscli_facts
+  ignore_errors: true
+  changed_when: false
+
+- name: set_fact awscli_path
+  set_fact:
+    awscli_path: "{{ awscli_facts.stdout_lines[0] }}"
+  when: awscli_facts.rc==0 and awscli_facts.stdout_lines|length>0
+
+- name: check aws version
+  command: 
+    argv:
+      - "{{ awscli_path }}"
+      - "--version"
+  register: awscli_facts1
+  when: awscli_facts.rc==0 and awscli_facts.stdout_lines|length>0
+  changed_when: false
+
+- name: set_fact awscli_version
+  set_fact:
+    awscli_version: "{{ awscli_facts1.stdout_lines[0].split(' ')[0].split('/')[1] }}"
+  when: awscli_facts.rc==0 and awscli_facts1.stdout_lines|length>0
+  changed_when: false
+
+- name: check awscli latest version
+  uri:
+    url: https://api.github.com/repos/aws/aws-cli/tags
+  register: awsgithub_facts
+  ignore_errors: true
+
+- name: set_fact awscli_lastversion
+  set_fact:
+    awscli_lastversion: "{{ awsgithub_facts.json[0].name }}"
+  when: awsgithub_facts is defined and awsgithub_facts.status==200
+  changed_when: false
+
+- name: set_fact aws_installtype
+  set_fact:
+    aws_installtype: "{% 
+                      if awscli_facts.rc==1 or (awscli_facts.rc==0 and awscli_version is defined and awscli_version.split('.')[0]|int<2) %}install{% 
+                      elif awscli_facts.rc==0 and awscli_version is defined and awscli_lastversion is defined and awscli_version!=awscli_lastversion %}update{% 
+                      else %}none{% 
+                      endif %}"

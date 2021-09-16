@@ -1,0 +1,20 @@
+{% if awscli_users[_user]['default']['config'] is not defined %}
+[default]
+{% for key,data in awscli_defaultconfig.items() %}
+{{ key }} = {{ data }}
+{% endfor %}
+{% endif %}
+{% if awscli_users[_user] is defined and awscli_users[_user] is iterable %}
+{% for awscli_profiles in awscli_users[_user] %}
+{% if awscli_users[_user][awscli_profiles]['config'] is defined %}
+{% if awscli_profiles=='default' %}
+[{{ awscli_profiles }}]
+{% else %}
+[profile {{ awscli_profiles }}]
+{% endif %}
+{% for key,data in awscli_users[_user][awscli_profiles]['config'].items() %}
+{{ key }} = {{ data }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
