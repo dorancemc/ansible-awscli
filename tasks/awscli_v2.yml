@@ -1,5 +1,11 @@
 ---
 
+- name: Install zip
+  ansible.builtin.package:
+    name: zip
+    state: present
+  register: zip_install
+
 - name: Create temporary directory
   ansible.builtin.tempfile:
     state: directory
@@ -35,3 +41,9 @@
     state: absent
   no_log: true
   changed_when: false
+
+- name: Uninstall zip
+  ansible.builtin.package:
+    name: zip
+    state: present
+  when: zip_install is defined and zip_install is changed
