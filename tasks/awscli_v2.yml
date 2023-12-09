@@ -1,36 +1,37 @@
 ---
 
-- name: create temporary directory
-  tempfile:
+- name: Create temporary directory
+  ansible.builtin.tempfile:
     state: directory
     suffix: awscli
   register: tempfolder
   changed_when: false
 
-- name: download awscli
-  unarchive:
+- name: Download awscli
+  ansible.builtin.unarchive:
     src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
     dest: "{{ tempfolder.path }}"
-    remote_src: yes
+    remote_src: true
 
-- name: installing awscli
-  command: 
+- name: Installing awscli
+  become: true
+  ansible.builtin.command:
     cmd: "./install"
     chdir: "{{ tempfolder.path }}/aws/"
-  become: yes
   when: aws_installtype=="install"
 
-- name: updating awscli
-  command: 
-    argv: 
+- name: Updating awscli
+  become: true
+  ansible.builtin.command:
+    argv:
       - "./install"
       - "--update"
     chdir: "{{ tempfolder.path }}/aws/"
-  become: yes
   when: aws_installtype=="update"
 
-- name: delete temporary directory
-  file:
+- name: Delete temporary directory
+  ansible.builtin.file:
     path: "{{ tempfolder.path }}"
     state: absent
-  no_log: yes
+  no_log: true
+  changed_when: false

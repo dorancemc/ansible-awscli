@@ -1,18 +1,19 @@
 ---
 
-- include: awscli_facts.yml
+- import_tasks: awscli_facts.yml
 
-- name: deleting awscli python package version prior 2
-  pip:
+- name: Deleting awscli python package version prior 2
+  become: true
+  ansible.builtin.pip:
     name: awscli
     state: absent
-  become: yes
   when: awscli_facts.rc==0 and awscli_version is defined and awscli_version.split('.')[0]|int<2
 
-- include: awscli_v2.yml
+- import_tasks: awscli_v2.yml
   when: aws_installtype=="install" or aws_installtype=="update"
 
-- include: awscli_configure.yml
+- include_tasks: awscli_configure.yml
   with_items: "{{ awscli_users }}"
   loop_control:
     loop_var: _user
+  when: awscli_users is defined and awscli_users|length>0

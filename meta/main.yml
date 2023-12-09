@@ -1,8 +1,15 @@
+---
+
 galaxy_info:
   author: Dorance Martinez
-  description:
-  company: None
-  license: BSD
-  min_ansible_version: 1.2
+  description: Role to install/upgrade and configure awscli
+  company: ""
+  license: Apache-2.0
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
   galaxy_tags: []
+
 dependencies: []
