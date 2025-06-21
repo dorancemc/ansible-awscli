@@ -1,0 +1,37 @@
+---
+name: Validate Ansible Role
+
+on:
+  push:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install yamllint ansible molecule molecule-docker
+
+      - name: Run yamllint
+        run: yamllint -f colored .
+
+      - name: Setup test environment
+        run: |
+          mkdir -p tests/roles
+          ln -s $PWD tests/roles/awscli
+          chmod 755 tests
+
+      - name: Run ansible-playbook syntax check
+        run: |
+          cd tests && ansible-playbook -i inventory --syntax-check test.yml

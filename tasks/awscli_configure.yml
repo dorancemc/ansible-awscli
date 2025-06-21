@@ -1,6 +1,7 @@
 ---
 
-- ansible.builtin.getent:
+- name: Retrieve user information from passwd database
+  ansible.builtin.getent:
     database: passwd
     key: "{{ item }}"
     split: ":"
@@ -8,7 +9,7 @@
   with_items:
     - "{{ _user }}"
 
-- name: set_fact default path user
+- name: Set user home directory path
   ansible.builtin.set_fact:
     _homepath: "{{ datauser.results[0].ansible_facts.getent_passwd[_user][4] }}"
 
@@ -23,7 +24,7 @@
   with_items:
     - "{{ _user }}"
 
-- name: Write AWS credentials file
+- name: Create AWS credentials file from template
   become: true
   ansible.builtin.template:
     src: credentials.j2
@@ -34,7 +35,7 @@
   with_items:
     - "{{ _user }}"
 
-- name: Write AWS config file
+- name: Create AWS config file from template
   become: true
   ansible.builtin.template:
     src: config.j2

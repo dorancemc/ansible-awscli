@@ -6,27 +6,29 @@
     state: present
   register: zip_install
 
-- name: Create temporary directory
+- name: Create temporary directory for AWS CLI installation
   ansible.builtin.tempfile:
     state: directory
     suffix: awscli
   register: tempfolder
   changed_when: false
+  check_mode: false
 
-- name: Download awscli
+- name: Download and extract AWS CLI v2 installer
   ansible.builtin.unarchive:
     src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
     dest: "{{ tempfolder.path }}"
-    remote_src: true
+    remote_src: yes
 
-- name: Installing awscli
+- name: Install AWS CLI v2
   become: true
   ansible.builtin.command:
     cmd: "./install"
     chdir: "{{ tempfolder.path }}/aws/"
   when: aws_installtype=="install"
+  ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Updating awscli
+- name: Update AWS CLI v2
   become: true
   ansible.builtin.command:
     argv:
@@ -34,16 +36,17 @@
       - "--update"
     chdir: "{{ tempfolder.path }}/aws/"
   when: aws_installtype=="update"
+  ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Delete temporary directory
+- name: Clean up temporary installation directory
   ansible.builtin.file:
     path: "{{ tempfolder.path }}"
     state: absent
   no_log: true
-  changed_when: false
+  check_mode: false
 
 - name: Uninstall zip
   ansible.builtin.package:
     name: zip
-    state: present
+    state: absent
   when: zip_install is defined and zip_install is changed

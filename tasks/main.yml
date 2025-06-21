@@ -1,18 +1,21 @@
 ---
 
-- import_tasks: awscli_facts.yml
+- name: Import AWS CLI facts gathering tasks
+  ansible.builtin.import_tasks: awscli_facts.yml
 
-- name: Deleting awscli python package version prior 2
+- name: Remove legacy AWS CLI Python package (version < 2)
   become: true
   ansible.builtin.pip:
     name: awscli
     state: absent
   when: awscli_facts.rc==0 and awscli_version is defined and awscli_version.split('.')[0]|int<2
 
-- import_tasks: awscli_v2.yml
+- name: Install or update AWS CLI v2
+  ansible.builtin.import_tasks: awscli_v2.yml
   when: aws_installtype=="install" or aws_installtype=="update"
 
-- include_tasks: awscli_configure.yml
+- name: Configure AWS CLI for users
+  ansible.builtin.include_tasks: awscli_configure.yml
   with_items: "{{ awscli_users }}"
   loop_control:
     loop_var: _user

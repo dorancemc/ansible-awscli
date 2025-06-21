@@ -1,8 +1,9 @@
 ---
 
 # awscli_users:
-#   backup:  # user
-#     default:  # profile
+#   backup:  # user on the system, should exist on passwd file
+#     default:  # aws profile file name
+#       region: us-east-1
 #       aws_access_key_id: changeme  # key definition
 #       aws_secret_access_key: changeme
 

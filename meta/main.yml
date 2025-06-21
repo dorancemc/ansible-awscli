@@ -3,6 +3,8 @@
 galaxy_info:
   author: Dorance Martinez
   description: Role to install/upgrade and configure awscli
+  role_name: awscli
+  namespace: dorance
   company: ""
   license: Apache-2.0
   min_ansible_version: "2.15"
