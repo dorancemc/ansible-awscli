@@ -1,47 +1,42 @@
 ---
-
 - name: Retrieve user information from passwd database
   ansible.builtin.getent:
     database: passwd
-    key: "{{ item }}"
+    key: "{{ __awscli_user }}"
     split: ":"
-  register: datauser
-  with_items:
-    - "{{ _user }}"
+  register: __awscli_passwd
 
 - name: Set user home directory path
   ansible.builtin.set_fact:
-    _homepath: "{{ datauser.results[0].ansible_facts.getent_passwd[_user][4] }}"
+    __awscli_homepath: "{{ __awscli_passwd.ansible_facts.getent_passwd[__awscli_user][4] }}"
 
 - name: Create AWS configuration directory
   become: true
   ansible.builtin.file:
-    path: "{{ _homepath }}/.aws"
+    path: "{{ __awscli_homepath }}/.aws"
     state: directory
-    owner: "{{ _user }}"
-    group: "{{ _user }}"
-    mode: 0700
-  with_items:
-    - "{{ _user }}"
+    owner: "{{ __awscli_user }}"
+    group: "{{ __awscli_user }}"
+    mode: "0700"
 
 - name: Create AWS credentials file from template
   become: true
   ansible.builtin.template:
     src: credentials.j2
-    dest: "{{ _homepath }}/.aws/credentials"
-    owner: "{{ _user }}"
-    group: "{{ _user }}"
-    mode: 0600
-  with_items:
-    - "{{ _user }}"
+    dest: "{{ __awscli_homepath }}/.aws/credentials"
+    owner: "{{ __awscli_user }}"
+    group: "{{ __awscli_user }}"
+    mode: "0600"
+  no_log: true
+  diff: false
 
 - name: Create AWS config file from template
   become: true
   ansible.builtin.template:
     src: config.j2
-    dest: "{{ _homepath }}/.aws/config"
-    owner: "{{ _user }}"
-    group: "{{ _user }}"
-    mode: 0600
-  with_items:
-    - "{{ _user }}"
+    dest: "{{ __awscli_homepath }}/.aws/config"
+    owner: "{{ __awscli_user }}"
+    group: "{{ __awscli_user }}"
+    mode: "0600"
+  no_log: true
+  diff: false

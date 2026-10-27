@@ -16,7 +16,7 @@
 
 - name: Configure AWS CLI for users
   ansible.builtin.include_tasks: awscli_configure.yml
-  with_items: "{{ awscli_users }}"
+  loop: "{{ awscli_users | default({}) | dict2items | map(attribute='key') | sort }}"
   loop_control:
-    loop_var: _user
+    loop_var: __awscli_user
   when: awscli_users is defined and awscli_users|length>0

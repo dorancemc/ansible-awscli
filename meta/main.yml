@@ -1,17 +1,19 @@
 ---
-
 galaxy_info:
   author: Dorance Martinez
-  description: Role to install/upgrade and configure awscli
+  company: dorancemc
+  description: Install, update and configure AWS CLI v2 for users
   role_name: awscli
-  namespace: dorance
-  company: ""
   license: Apache-2.0
-  min_ansible_version: "2.15"
+  min_ansible_version: 2.20
   platforms:
+    - name: Debian
+      versions:
+        - all
     - name: Ubuntu
       versions:
         - all
-  galaxy_tags: []
+  galaxy_tags:
+    - awscli
 
 dependencies: []
